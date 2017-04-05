@@ -1,5 +1,7 @@
 /** Created by alex on 28.02.2017 **/
 'use strict';
+require('./config/config');
+
 // node-modules
 const _ = require('lodash');
 const express = require('express');

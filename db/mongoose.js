@@ -2,8 +2,8 @@
 'use strict';
 const mongoose = require('mongoose');
 
-// change third-party librarie in mongoose with native JS promises
+// change third-party library in mongoose with native JS promises
 mongoose.Promise = global.Promise;
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/TodoApp');
+mongoose.connect(process.env.MONGODB_URI);
 
 module.exports = { mongoose };
