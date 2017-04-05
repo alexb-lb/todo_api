@@ -11,7 +11,9 @@ const todos = [{
   text: 'Some text 1'
 }, {
   _id: new ObjectId(),
-  text: 'Some text 2'
+  text: 'Some text 2',
+  completed: true,
+  time: 333
 }];
 
 // remove all Todos before testing, because we will expect length == 1
@@ -146,6 +148,55 @@ describe('DELETE /todos/:id', () => {
   it('should return 404 for non-object ids', (done) => {
     request(app)
       .delete(`/todos/123`)
+      .expect(404)
+      .end(done);
+  });
+});
+
+describe('PATCH /todos/:id', () => {
+  it('should update the todo', (done) => {
+    let hexId = todos[0]._id.toHexString();
+    let text = "test updates 1";
+
+    request(app)
+      .patch(`/todos/${hexId}`)
+      .send({text, completed: true})
+      .expect(200)
+      .expect((res) => {
+        assert(res.body.todo.text).toBe(text);
+        assert(res.body.todo.completed).toBe(true);
+        assert(res.body.todo.time).toBeA('number');
+      })
+      .end(done);
+  });
+
+  it('should clear time when todo is not completed', (done) => {
+    let hexId = todos[1]._id.toHexString();
+    let text = "test updates 2";
+
+    request(app)
+      .patch(`/todos/${hexId}`)
+      .send({text, completed: false})
+      .expect(200)
+      .expect((res) => {
+        assert(res.body.todo.text).toBe(text);
+        assert(res.body.todo.completed).toBe(false);
+        assert(res.body.todo.time).toNotExist();
+      })
+      .end(done);
+  });
+
+  it('should return 404 if todo not found', (done) => {
+    let hexId = new ObjectId().toHexString();
+    request(app)
+      .patch(`/todos/${hexId}`) // will be string like '58e20895f15ade11609642b4'
+      .expect(404)
+      .end(done);
+  });
+
+  it('should return 404 for non-object ids', (done) => {
+    request(app)
+      .patch(`/todos/123`)
       .expect(404)
       .end(done);
   });
