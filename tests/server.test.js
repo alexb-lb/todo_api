@@ -5,24 +5,13 @@ const {ObjectId} = require('mongodb');
 
 const {app} = require('./../server');
 const {Todo} = require('./../models/todo');
+const {todos, populateTodos, users, populateUsers} = require('./seed/seed.js');
 
-const todos = [{
-  _id: new ObjectId(),
-  text: 'Some text 1'
-}, {
-  _id: new ObjectId(),
-  text: 'Some text 2',
-  completed: true,
-  time: 333
-}];
 
 // remove all Todos before testing, because we will expect length == 1
 // of this collection below in tests
-beforeEach((done) => {
-  Todo.remove({}).then(()=> {
-    return Todo.insertMany(todos);
-  }).then(() => done());
-});
+beforeEach(populateUsers);
+beforeEach(populateTodos);
 
 // Testing post
 describe('POST /todos', () => {
@@ -71,7 +60,6 @@ describe('POST /todos', () => {
       });
   })
 });
-
 
 describe('GET /todos', () => {
 
@@ -201,3 +189,4 @@ describe('PATCH /todos/:id', () => {
       .end(done);
   });
 });
+

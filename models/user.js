@@ -50,8 +50,8 @@ UserSchema.methods.generateAuthToken = function () {
   let user = this;
   let access = 'auth';
 
-  // userId already taken, auth - just word in DB, 123abc - secret
-  let token = jwt.sign({_id: user._id.toHexString(), access}, 'secret').toString();
+  // userId already taken, auth - just word in DB, abc123 - secret
+  let token = jwt.sign({_id: user._id.toHexString(), access}, 'abc123').toString();
 
   user.tokens.push({access, token});
 
