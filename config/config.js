@@ -5,11 +5,13 @@
 // if server runs via Heroku.com, environment === 'production' by default
 const env = process.env.NODE_ENV || 'development';
 
-// set port and path to development and test DB if server runs locally
-if(env === 'development'){
-  process.env.PORT = 3000;
-  process.env.MONGODB_URI = 'mongodb://localhost:27017/TodoApp';
-} else if(env === 'test'){
-  process.env.PORT = 3000;
-  process.env.MONGODB_URI = 'mongodb://localhost:27017/TodoAppTest';
+if(env === 'development' || env === 'test'){
+  // "require" automatically convert JSON to JS object
+  let config = require('./config.json');
+  let envConfig = config[env];
+
+  // make array from object
+  Object.keys(envConfig).forEach((key) =>{
+    process.env[key] = envConfig[key];
+  })
 }

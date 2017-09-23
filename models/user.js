@@ -50,8 +50,8 @@ UserSchema.methods.generateAuthToken = function () {
   let user = this;
   let access = 'auth';
 
-  // userId already taken, auth - just word in DB, abc123 - secret
-  let token = jwt.sign({_id: user._id.toHexString(), access}, 'abc123').toString();
+  // userId already taken, auth - just word in DB, process.env.JWT_SECRET - secret from config
+  let token = jwt.sign({_id: user._id.toHexString(), access}, process.env.JWT_SECRET).toString();
 
   user.tokens.push({access, token});
 
@@ -61,7 +61,18 @@ UserSchema.methods.generateAuthToken = function () {
   })
 };
 
-// not arrow functions, cause it not bind 'this' keyword
+UserSchema.methods.removeToken = function (token) {
+  let user = this;
+
+  // $pull - mongoDB operator to remove items from the array by the criteria
+  return user.update({
+    $pull: {
+      tokens: {token}
+    }
+  });
+};
+
+
 UserSchema.statics.findByToken = function (token) {
   let User = this;
 
@@ -69,7 +80,7 @@ UserSchema.statics.findByToken = function (token) {
   let decoded;
 
   try {
-    decoded = jwt.verify(token, 'secret')
+    decoded = jwt.verify(token, process.env.JWT_SECRET)
   } catch (e){
     return Promise.reject();
   }
@@ -82,6 +93,26 @@ UserSchema.statics.findByToken = function (token) {
 };
 
 // not arrow functions, cause it not bind 'this' keyword
+UserSchema.statics.findByCredentials = function (email, password) {
+  let User = this;
+
+  return User.findOne({email}).then((user) => {
+    if(!user){
+      return Promise.reject();
+    }
+    
+    return new Promise((resolve, reject) => {
+      bcrypt.compare(password, user.password, (err, result) => {
+        if(result){
+          resolve(user);
+        } else {
+          reject();
+        }
+      });
+    })
+  })
+};
+
 UserSchema.pre('save', function (next) {
   let user = this;
 
