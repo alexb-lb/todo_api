@@ -1,4 +1,8 @@
 /** Created by alex on 28.02.2017 **/
+/***
+ * First start mongo: cmd -> START C:\Users\alex\Downloads\start-dev-course\start-mongo-server.bat
+ * Second - requests must be made via POSTMAN
+ ***/
 'use strict';
 require('./config/config');
 
